@@ -1,4 +1,4 @@
 ---
 
-certbot_email: jenkins@inari.pro
+certbot_email: jenkins@example.com
 certbot_webroot:  /var/www/html

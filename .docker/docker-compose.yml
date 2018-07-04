@@ -7,7 +7,7 @@ services:
         environment:
             - PREFIX_PATH=${SRC_PATH}
         volumes:
-            - '${SRC_PATH}:/opt/inaripro-configuration'
+            - '${SRC_PATH}:/opt/ansible-configuration'
         working_dir: /opt/ansible-configuration
         command: sleep infinity
 

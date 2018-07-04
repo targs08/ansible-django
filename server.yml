@@ -11,7 +11,6 @@
     - { role: 'nginx',      tags: ['nginx'] }
     - { role: 'rabbitmq',   tags: ['rabbitmq'] }
     - { role: 'elk', tags: ['elk', 'elasticsearch', 'kibana', 'logstash'] }
-    - { role: 'inaripro-backend', basic_install: true, tags: ['inaripro-backend', 'backend'] }
     - { role: 'fail2ban', tags: ['fail2ban'] }
     - { role: 'certbot', tags: ['certbot'] }
     - { role: 'knockd-server', tags: ['knockd'] }
@@ -21,7 +20,7 @@
     stage_name: 'undefined'
     host_hostname: "{{ stage_name }}"
 
-    server_url_prefix: inari24.ru
+    server_url_prefix: "example.com"
 
     ssh_user_root:
         key_list: '{{ auth_keys_admin }}'
@@ -31,13 +30,8 @@
     api_debug: True
     api_vhosts: 'api.{{ stage_name }}.{{ server_url_prefix }}'
 
-    order_email: 'm5@valoo.ru'
-
     virtualenv_name: "{{ stage_name }}"
 
-
-    inaripro_backend_scheme: https
-    inaripro_backend_ip_restrictions: true
 
     celery_count_worker: 1
 
