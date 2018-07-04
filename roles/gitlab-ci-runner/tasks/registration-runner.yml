@@ -1,0 +1,22 @@
+---
+
+- name: List configured runners
+  command: gitlab-runner list
+  register: configured_runners
+  changed_when: False
+
+- debug: var=configured_runners
+
+- debug:
+    msg: '{{ configured_runners.stderr.find(server_name) }}'
+
+- name: Register runner to GitLab
+  command: gitlab-ci-multi-runner register >
+    --non-interactive
+    --url '{{ gitlab_url }}'
+    --registration-token '{{ gitlab_token }}'
+    --name '{{ gitlab_runner_name }}'
+    --tag-list '{{ gitlab_runner_tags }}'
+    --executor 'docker'
+    --docker-image '{{ gitlab_runner_image }}'
+  when: configured_runners.stderr.find(server_name) == -1

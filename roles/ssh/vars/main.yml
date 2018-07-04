@@ -1,0 +1,18 @@
+---
+
+auth_keys_admin:
+    - name: 'targs08'
+      key:  'ssh-rsa ...'
+    - name: 'user01'
+      key:  'ssh-rsa ...'
+
+
+auth_keys_developers:
+    - name: 'taras'
+      key:  'ssh-rsa ...'
+    - name: 'user03'
+      key:  'ssh-rsa ...'
+
+auth_keys_ansible:
+    - name: 'ansible'
+      key:  'ssh-rsa ...'

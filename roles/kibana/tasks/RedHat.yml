@@ -1,0 +1,35 @@
+---
+
+- name: Kibana | Add rpm key
+  rpm_key:
+    state: present
+    key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+- name: Kibana | Add repository
+  yum_repository:
+    name: 'kibana-{{ kibana_repo_version }}'
+    description: 'Kibana repository for {{ kibana_repo_version }} packages'
+    baseurl: 'https://artifacts.elastic.co/packages/{{ kibana_repo_version }}/yum'
+    gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    enabled: yes
+
+- name: Kibana | add Kibana package
+  yum:
+    name: 'kibana-{{ kibana_version }}'
+    state: present
+
+- name: Install Elasticsearch head plugin
+  kibana_plugin:
+    state: present
+    name: elasticsearch/marvel
+
+
+- name: Kibana | Start the kibana service
+  service:
+    name: kibana
+    enabled: yes
+
+- name: Kibana | nginx render site template
+  template:
+    src: 'kibana.conf.j2'
+    dest: '/etc/nginx/conf.d/kibana.conf'

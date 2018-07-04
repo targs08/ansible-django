@@ -1,0 +1,7 @@
+---
+
+media_rsync_user:
+media_rsync_source:
+media_rsync_source_path:
+media_rsync_password:
+media_rsync_password_file:

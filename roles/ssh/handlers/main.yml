@@ -1,0 +1,8 @@
+---
+
+- name: restart ssh
+  service:
+    name: '{{ ssh_service_name }}'
+    state: restarted
+  vars:
+    ssh_service_name: '{% if ansible_distribution == "CentOS" %}sshd{% else %}ssh{% endif %}'

@@ -1,0 +1,16 @@
+---
+
+images_parameters:
+  ansistrano:
+    name: ezaytsev/ansible
+    path: ansistrano
+    tag: ansistrano
+  elasticsearch:
+    name: ezaytsev/ansible
+    path: elasticsearch
+    tag: elasticsearch
+  terraform:
+    name: devops/terraform
+    path: terraform
+    tag: latest
+

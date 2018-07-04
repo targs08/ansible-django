@@ -1,0 +1,15 @@
+
+allow 127.0.0.0/16;
+
+{%- for key, value in trust_ip_address.iteritems() %}
+
+# {{ key }}
+{% for item in value %}
+allow {{ item }};
+{% endfor %}
+{%- endfor %}
+
+
+include /tmp/knockd/nginx[.]acl;
+
+deny all;

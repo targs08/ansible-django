@@ -1,0 +1,44 @@
+- hosts: all
+  gather_facts: yes
+  roles:
+    - { role: 'ssh', root_without_password: true, tags: ['ssh'] }
+    - { role: 'fail2ban', tags: ['fail2ban'] }
+    - { role: 'docker', docker_install: true, network: true,  tags: ['docker'] }
+    - { role: 'iptables-rules', iptables_persistent: true, state: 'present', tags: ['iptables']}
+    - { role: 'gitlab-ci-runner', tags: ['gitlab-runner'] }
+  vars:
+    host_hostname: "{{ server_name }}"
+
+
+    #debian_release: "stretch"
+    debian_release: "{{ ansible_distribution_release }}"
+
+    ssh_user_root:
+        key_list: ''
+
+    apt_cache_valid_time: 3600
+    # Для генерации пароля: mkpasswd --method=SHA-512
+    ssh_users:
+      - user: 'ansible'
+        shell: '/bin/bash'
+        groups:
+        password: ''
+        key_list: ''
+
+    sudo_rules:
+      - user: 'ansible'
+        rule: 'ALL=(ALL)'
+        program: 'NOPASSWD:ALL'
+
+    iptables_host_rule:
+      wan_iface: '{{ ansible_default_ipv4.interface }}'
+      icmp_allow: true
+      policy_default:
+        INPUT: DROP
+        FORWARD: DROP
+        OUTPUT: ACCEPT
+      port_access:
+        - { chain: 'INPUT', source: '0.0.0.0/0', protocol: 'tcp', destination_port: '22',    comment: 'SSH Port',   jump: 'ACCEPT' }
+
+  handlers:
+      - import_tasks: handlers/main.yml

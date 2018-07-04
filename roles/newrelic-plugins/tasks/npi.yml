@@ -1,0 +1,32 @@
+---
+
+- name: Download npi installer
+  get_url:
+    url: 'https://download.newrelic.com/npi/release/install-npi-linux-redhat-x64.sh'
+    dest: '/usr/src/install-npi-linux-redhat-x64.sh'
+    mode: 0755
+
+- name: install npi installer
+  command: /usr/src/install-npi-linux-redhat-x64.sh -u
+  environment:
+    LICENSE_KEY: '{{ newrelic_license_key }}'
+    PREFIX: '/usr/local/newrelic'
+  args:
+    creates: /usr/local/newrelic/npi
+
+- name: install plugins via npi
+  command: bin/node npi.js install {{ item.plugin }} -n -y
+  args:
+    chdir: /usr/local/newrelic
+    creates: '/usr/local/newrelic/plugins/{{ item.plugin }}'
+  with_items: '{{ npi_list_plugins }}'
+- name: generate systemd config for plugin
+  template:
+    src: 'newrelic-plugin-npi.service.j2'
+    dest: '{{ systemd_path }}/newrelic-plugin-{{ service_name }}.service'
+  vars:
+    service_name: '{{ item.name }}'
+    plugin_name: '{{ item.plugin }}'
+    systemd_path: '/etc/systemd/system'
+  notify: systemd-reload
+  with_items: '{{ npi_list_plugins }}'

@@ -1,0 +1,32 @@
+---
+
+- name: gitlab-ci-runner create directory
+  file:
+    state: directory
+    path: '/srv/gitlab-runner/config'
+
+- name: gitlab-ci-runner create directory
+  template:
+    src: 'config.toml.j2'
+    dest: '/srv/gitlab-runner/config/config.toml'
+
+- name: gitlab-ci-runner deploy via docker-compose
+  docker_service:
+    project_name: gitlab-ci
+    pull: true
+    scale:
+      runner: 1
+    definition:
+        version: '2'
+        services:
+          runner:
+            restart: always
+            image: gitlab/gitlab-runner:latest
+            volumes:
+              - /var/run/docker.sock:/var/run/docker.sock
+              - /srv/gitlab-runner/config:/etc/gitlab-runner
+            networks:
+              - '{{ network }}'
+        networks: '{{ { network: { "external": true } } }}'
+  vars:
+    network: '{{ docker_default_network.name }}'

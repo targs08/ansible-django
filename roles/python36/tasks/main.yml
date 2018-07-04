@@ -1,0 +1,14 @@
+---
+
+
+- include_tasks: 'pre-package-{{ ansible_os_family }}.yml'
+
+- hostname: name='{{ host_hostname }}'
+
+- block:
+  - include_tasks: build.yml
+    when: python_source_build|default(false)|bool == True
+  when: python_version|version_compare('3.6')
+
+- include_tasks: pip.yml
+  when: python_pip_install|default(false)|bool == True

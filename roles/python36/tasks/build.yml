@@ -1,0 +1,35 @@
+---
+
+- name: Python 3.6 | Download source
+  get_url:
+    url: https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tgz
+    dest: /usr/src/
+
+- name: Python 3.6 | Extract source
+  unarchive:
+    src: '/usr/src/Python-3.6.0.tgz'
+    dest: '/usr/src/'
+    remote_src: yes
+
+- name: Python 3.6 | ./configure source code
+  command: '{{ item }}'
+  args:
+    chdir: '/usr/src/Python-3.6.0'
+    creates: '/usr/src/Python-3.6.0/Makefile'
+  with_items:
+    - './configure --enable-optimizations'
+
+- name: Python 3.6 | make source code default target
+  make:
+    chdir: '/usr/src/Python-3.6.0'
+    params:
+      NUM_THREADS: '{{ ansible_processor_count }}'
+
+- name: Python 3.6 | make source code
+  make:
+    chdir: '/usr/src/Python-3.6.0'
+    target: '{{ item }}'
+    params:
+      NUM_THREADS: '{{ ansible_processor_count }}'
+  with_items:
+    - 'altinstall'

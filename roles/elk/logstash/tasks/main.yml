@@ -1,0 +1,29 @@
+---
+
+- name: ELK Logstash | Install Logstash
+  apt:
+    name: '{{ item }}'
+    state: present
+    update_cache: yes
+  with_items:
+    - 'logstash=1:{{ elasticsearch_version }}-1'
+  notify:
+    - restart logstash
+
+- name: ELK Logstash | Install Logstash
+  template:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  with_items:
+    - { src: 'logstash.conf.j2', dest: '/etc/logstash/conf.d/logstash.conf' }
+    - { src: 'rsyslog.conf.j2', dest: '/etc/rsyslog.d/10-logstash.conf' }
+  notify:
+  - restart rsyslog
+  - restart logstash
+
+- name: ELK Logstash | Start logstash service
+  service:
+    name: '{{ item }}'
+    enabled: yes
+  with_items:
+    - logstash

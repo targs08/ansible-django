@@ -1,0 +1,9 @@
+---
+
+gitlab_token: ""
+gitlab_url: https://gitlab.inari.pro/
+gitlab_runner_name: "{{ server_name }}"
+gitlab_runner_image: debian:latest
+gitlab_runner_tags: "backend,frontend"
+gitlab_runner_concurrent: '{{ parallel_job | default("5") }}'
+gitlab_runner_state: register

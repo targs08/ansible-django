@@ -1,0 +1,19 @@
+---
+
+#knockd_rules:
+#  - name: nginx acl
+#    sequence:
+#      - 7000
+#      - 8000
+#      - 9000
+#    sequence_timeout: 15
+#    start_command: 'echo "allow %IP%;" >> knoker.acl && nginx -s reload'
+#    cmd_timeout: 3600
+#    stop_command: 'sed -i "/^allow %IP%;/d" /etc/nginx/acl/knockd.acl && nginx -s reload'
+#  - name: rsync
+#    sequence:
+#      - 7001
+#      - 8001
+#      - 9001
+#    secure_ports:
+#      - 873

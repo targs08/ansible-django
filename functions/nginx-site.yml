@@ -1,0 +1,14 @@
+---
+
+- name: Nginx | [{{ item.name }}] nginx render site template
+  template:
+    src: '{{ item.template }}'
+    dest: '/etc/nginx/sites-available/{{ item.name }}'
+  notify: restart nginx
+
+- name: Nginx | [{{ item.name }}] nginx activate site
+  file:
+    src: '/etc/nginx/sites-available/{{ item.name }}'
+    dest: '/etc/nginx/sites-enabled/{{ item.name }}'
+    state: link
+  notify: restart nginx

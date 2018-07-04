@@ -1,0 +1,21 @@
+---
+
+- include_tasks: '{{ ansible_os_family }}.yml'
+
+- name: Copy the client configuration file
+  template:
+    src: 'memcached-{{ ansible_os_family }}.j2'
+    dest: '{{ memcached_conf_path }}'
+  notify: restart memcached
+
+- name: Set the max open file descriptors
+  sysctl:
+    name: fs.file-max
+    value: '{{ memcached_fs_file_max }}'
+    state: present
+    ignoreerrors: yes
+
+- name: Start the memcached service
+  service:
+    name: memcached
+    enabled: yes

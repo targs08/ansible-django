@@ -1,0 +1,33 @@
+---
+
+- name: Elasticsearch | Install Elasticsearch
+  apt:
+    name: '{{ item }}'
+    state: present
+    update_cache: yes
+  with_items:
+    - 'elasticsearch={{ elasticsearch_version }}'
+  notify:
+    - restart elasticsearch
+
+- name: Elasticsearch | set JAVA OPTS
+  lineinfile:
+    dest: '/etc/default/elasticsearch'
+    regexp: '^(\#|)ES_JAVA_OPTS\='
+    line: 'ES_JAVA_OPTS="-Xms{{ (ansible_memtotal_mb * 0.3) | int }}m -Xmx{{ (ansible_memtotal_mb * 0.3) | int }}m"'
+    insertbefore: '^\# Additional Java OPTS'
+  notify:
+    - restart elasticsearch
+
+- include_tasks: functions/nginx-site.yml
+  with_items:
+    - { name: 'elasticsearch', template: 'elasticsearch.conf.j2' }
+  notify:
+    - restart elasticsearch
+
+- name: Elasticsearch | Start the kibana, elasticsearch service
+  service:
+    name: '{{ item }}'
+    enabled: yes
+  with_items:
+    - elasticsearch

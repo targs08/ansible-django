@@ -1,0 +1,18 @@
+---
+
+- include_vars: vars/rabbitmq_access.yml
+
+- name: RabbitMQ | User Access
+  rabbitmq_user:
+    user: '{{ item.user }}'
+    password: '{{ item.password }}'
+    permissions: '{{ item.permissions }}'
+    tags: '{{ item.tags }}'
+  with_items:
+    - '{{ rabbitmq_users }}'
+
+- name: RabbitMQ | User Access
+  rabbitmq_user:
+    user: 'guest'
+    password: 'guest'
+    state: absent

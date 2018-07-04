@@ -1,0 +1,67 @@
+---
+
+- name: installs iptables-persistent
+  apt:
+    name: iptables-persistent
+    update_cache: 'yes'
+    cache_valid_time: 3600
+  when: iptables_persistent|bool == true
+
+- name: iptables - policy default ACCEPT
+  iptables:
+    chain: INPUT
+    policy: ACCEPT
+  when: state == 'absent'
+
+- name: iptalies - allow traffic in lo
+  iptables:
+    state: '{{ state }}'
+    chain: INPUT 
+    in_interface: '{{ item }}'
+    jump: ACCEPT
+  with_items: '{{ iptables_host_rule.accept_iface | default(ansible_lo.device) }}'
+
+- name: iptables - allow related and established
+  iptables:
+    state: '{{ state }}'
+    chain: INPUT 
+    in_interface: '{{ iface }}'
+    ctstate: RELATED,ESTABLISHED 
+    jump: ACCEPT
+  vars:
+    iface: '{{ iptables_host_rule.wan_iface }}'
+
+- name: iptables - allow icmp
+  iptables:
+    state: '{{ state }}'
+    chain: INPUT 
+    in_interface: '{{ iface }}'
+    protocol: icmp 
+    icmp_type: 8 
+    jump: ACCEPT
+  vars:
+    iface: '{{ iptables_host_rule.wan_iface }}'
+  when: iptables_host_rule.icmp_allow == True
+
+- name: iptables - port access
+  iptables: 
+    state: '{{ state }}'
+    chain: '{{ item.chain }}'
+    in_interface: '{{ iface }}'
+    protocol: '{{ item.protocol }}'
+    source: '{{ item.source }}'    
+    destination_port: '{{ item.destination_port }}'
+    comment: '{{ item.comment }}'
+    jump: '{{ item.jump }}'
+  vars:
+    iface: '{{ iptables_host_rule.wan_iface }}'
+  with_items: '{{ iptables_host_rule.port_access }}'
+
+- name: iptables - policy default DROP
+  iptables:
+    chain: '{{ item.key }}'
+    policy: '{{ item.value }}'
+  with_dict: '{{ iptables_host_rule.policy_default }}'
+  when: state == 'present'
+
+#Ansible Docs Module: http://docs.ansible.com/ansible/iptables_module.html

@@ -1,0 +1,12 @@
+---
+
+- name: Install the memcached packages
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - memcached
+
+- name: Set Memcached config path
+  set_fact:
+    memcached_conf_path: '/etc/memcached.conf'

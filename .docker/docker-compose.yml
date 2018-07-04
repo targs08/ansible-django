@@ -1,0 +1,13 @@
+version: "2"
+
+services:
+    ansible:
+        build: ansible
+        privileged: true
+        environment:
+            - PREFIX_PATH=${SRC_PATH}
+        volumes:
+            - '${SRC_PATH}:/opt/inaripro-configuration'
+        working_dir: /opt/ansible-configuration
+        command: sleep infinity
+

@@ -1,0 +1,7 @@
+---
+
+newrelic_pluging_postgres_user:
+newrelic_pluging_postgres_password:
+
+newrelic_pluging_rabbitmq_user:
+newrelic_pluging_rabbitmq_password:

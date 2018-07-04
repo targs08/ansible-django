@@ -1,0 +1,30 @@
+---
+
+- name: Rsync server | install rsync
+  apt:
+    name: '{{ item }}'
+    update_cache: 'yes'
+    cache_valid_time: 3600
+  with_items:
+    - rsync
+
+- name: Rsync server | Set rsync password
+  copy:
+    content: '{{ media_rsync_user }}:{{ media_rsync_password }}'
+    dest: '{{ media_rsync_password_file }}'
+    mode: 0600
+  notify: restart rsync-server
+
+- name: Rsync server | render rsync config
+  template:
+    src: 'rsyncd.conf.j2'
+    dest: '/etc/rsyncd.conf'
+  notify: restart rsync-server
+
+- name: Rsync server | Enabled rsync server
+  lineinfile:
+    dest: /etc/default/rsync
+    state: absent
+    regexp: '^RSYNC_ENABLE.*$'
+    line: 'RSYNC_ENABLE=true'
+  notify: restart rsync-server

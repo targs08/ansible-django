@@ -1,0 +1,9 @@
+#/etc/fail2ban/jail.local
+
+[DEFAULT]
+ignoreip = {{ iptables_trust_ip | join(" ") }}
+
+[ssh]
+maxretry = 5
+findtime    = 3600
+bantime     = 86400

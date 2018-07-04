@@ -1,0 +1,22 @@
+---
+
+- include_tasks: '{{ ansible_os_family }}.yml'
+
+- name: Install python dependence
+  pip:
+    name: '{{ item }}'
+  with_items: '{{ python_module }}'
+
+- name: PostgreSQL | generate postgresql configuration
+  template:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  with_items:
+    - { src: 'postgresql.conf.j2',  dest: '{{ postgresql_config_path }}/postgresql.conf' }
+    - { src: 'pg_hba.conf.j2',      dest: '{{ postgresql_config_path }}/pg_hba.conf' }
+  notify: restart postgresql
+
+- name: PostgreSQL | Enable service
+  service:
+    name: postgresql
+    enabled: yes

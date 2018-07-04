@@ -1,0 +1,7 @@
+---
+dependencies:
+  - { role: java }
+  - { role: elk/common, tag: elk }
+  - { role: elk/elasticsearch, tag: [ 'elasticsearch', 'elk' ] }
+  - { role: elk/kibana, tag: [ 'kibana', 'elk' ] }
+  - { role: elk/logstash, tag: [ 'logstash', 'elk' ] }

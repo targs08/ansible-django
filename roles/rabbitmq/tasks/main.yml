@@ -1,0 +1,7 @@
+---
+
+- include_tasks: install.yml
+  when: rabbitmq_install|default(false)|bool == True
+
+- include_tasks: access.yml
+  when: rabbitmq_access|default(false)|bool == True

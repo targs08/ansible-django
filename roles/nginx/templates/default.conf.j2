@@ -1,0 +1,14 @@
+server {
+	listen       80 default;
+	server_name  _;
+	return 444;
+}
+
+server {
+	listen       443 ssl default;
+	server_name  _;
+	ssl on;
+	ssl_certificate "/etc/nginx/ssl/inari.pro.crt";
+	ssl_certificate_key "/etc/nginx/ssl/inari.pro.key";
+	return 444;
+}

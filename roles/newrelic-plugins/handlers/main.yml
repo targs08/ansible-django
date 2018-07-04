@@ -1,0 +1,9 @@
+---
+
+- name: systemd-reload
+  command: 'systemctl daemon-reload'
+
+- name: restart newrelic-plugin-agent
+  service:
+    name: newrelic-plugin-agent
+    state: restarted

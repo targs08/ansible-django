@@ -1,0 +1,48 @@
+---
+#- debug:
+#   msg: '{{  ansible_distribution  }}'
+
+- block:
+  - name: GitLab Runner | download executor
+    get_url:
+      url: https://packages.gitlab.com/install/repositories/runner/gitlab-ci-multi-runner/script.rpm.sh
+      dest: /usr/src/gitlab-runner.scripts.sh
+      mode: 0755
+  - name: GitLab Runner | gitlab-ci-runner repo
+    command: /usr/src/gitlab-runner.scripts.sh
+    args:
+      creates: /etc/yum.repos.d/runner_gitlab-ci-multi-runner.repo
+  - name: GitLab Runner | install gitlab-ci-multi-runner
+    yum:
+      name: gitlab-ci-multi-runner
+      state: latest
+      update_cache: yes
+  when: ansible_distribution == "CentOS"
+
+- block:
+  - name: GitLab Runner | download executor
+    get_url:
+      url: https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh
+      dest: /usr/src/gitlab-runner.scripts.sh
+      mode: 0755
+    notify: restart gitlab-runner
+  - name: GitLab Runner | gitlab-ci-runner repo
+    command: /usr/src/gitlab-runner.scripts.sh
+    args:
+      creates: /etc/apt/sources.list.d/runner_gitlab-runner.list
+    notify: restart gitlab-runner
+  - name: GitLab Runner | install gitlab-ci-multi-runner
+    apt:
+      name: gitlab-runner
+      state: latest
+      update_cache: yes
+    notify: restart gitlab-runner
+  when: ansible_distribution == "Debian"
+
+#- name: GitLab Runner | render template
+#  template:
+#    src: config.toml.j2
+#    dest: /etc/gitlab-runner/config.toml
+#  notify: restart gitlab-runner
+
+- include_tasks: registration-runner.yml

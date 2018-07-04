@@ -1,0 +1,60 @@
+{
+  "version" : 1,
+  "index_patterns" : [
+    {
+      "es": {
+        "default_index": "logstash-*"
+      },
+      "tail_interval_in_seconds": 10,
+      "es_index_time_offset_in_seconds": 0,
+      "display_timezone": "Europe/Samara",
+      "display_timestamp_format": "MMM DD HH:mm:ss",
+      "max_buckets": 500,
+      "default_time_range_in_days" : 0,
+      "max_hosts": 100,
+      "max_events_to_keep_in_viewer": 5000,
+      "fields" : {
+        "mapping" : {
+          "timestamp" : "@timestamp",
+          "display_timestamp" : "@timestamp",
+          "hostname" : "syslog_hostname",
+          "program": "syslog_program",
+          "message": "syslog_message"
+        },
+        "message_format": "{{ '{{{syslog_message}}}' }}"
+      }
+    },
+    {
+      "es": {
+        "default_index": "http-access-*"
+      },
+      "tail_interval_in_seconds": 10,
+      "es_index_time_offset_in_seconds": 0,
+      "display_timezone": "Europe/Samara",
+      "display_timestamp_format": "MMM DD HH:mm:ss",
+      "max_buckets": 500,
+      "default_time_range_in_days" : 0,
+      "max_hosts": 100,
+      "max_events_to_keep_in_viewer": 5000,
+      "fields" : {
+        "mapping" : {
+          "timestamp" : "@timestamp",
+          "display_timestamp" : "@timestamp",
+          "hostname" : "host",
+          "program": "response",
+          "message": "request"
+        },
+        "message_format": "{{'{{{ verb }}} | {{{request}}}' }}"
+      },
+      "color_mapping" : {
+        "field": "verb",
+        "mapping": {
+          "500": "#FF0000",
+          "503": "#FF0000",
+          "504": "#FF0000",
+          "404": "#FFEF96"
+        }
+      }
+    }
+  ]
+}

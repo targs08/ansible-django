@@ -1,0 +1,5 @@
+---
+
+- name: Unregister runner to GitLab
+  command: gitlab-ci-multi-runner unregister >
+    --name '{{ gitlab_runner_name }}'

@@ -1,0 +1,10 @@
+---
+
+- name: ELK Common | Add repository key to the system
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+- name: ELK Common | Install repository
+  apt_repository:
+    repo: 'deb https://artifacts.elastic.co/packages/{{ elasticsearch_version.split(".")[0] }}.x/apt stable main'
+    state: present

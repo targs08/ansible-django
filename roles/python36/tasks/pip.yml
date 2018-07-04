@@ -1,0 +1,97 @@
+---
+
+- name: Python 3.6 | Download get-pip.py
+  get_url:
+    url: https://bootstrap.pypa.io/get-pip.py
+    dest: /usr/src/
+
+- name: Python {{ python3_version_default }} | Install pip
+  command: "{{ item.python }} /usr/src/get-pip.py"
+  args:
+    creates: '/usr/local/bin/{{ item.pip }}'
+  with_items:
+    - { python: 'python2.7', pip: 'pip2.7' }
+    - { python: 'python{{ python3_version_default | default("3.4") }}', pip: 'pip{{ python3_version_default | default("3.4") }}' }
+
+- name: Python {{ python3_version_default }} | Update alternatives for python
+  alternatives:
+    name: python
+    link: /usr/local/bin/python
+    path: '{{ item.path }}'
+    priority: '{{ item.priority }}'
+  with_items:
+    - { path: '/usr/bin/python2.7', priority: '10' }
+    - { path: '/usr/bin/python{{ python3_version_default | default("3.4") }}', priority: '20' }
+
+- name: Python {{ python3_version_default }} | Update alternatives for python3
+  alternatives:
+    name: python3
+    link: /usr/local/bin/python3
+    path: '{{ item.path }}'
+    priority: '{{ item.priority }}'
+  with_items:
+    - { path: '/usr/bin/python{{ python3_version_default | default("3.4") }}', priority: '10' }
+
+- name: Python {{ python3_version_default }} | Update alternatives for pip
+  alternatives:
+    name: pip
+    link: /usr/local/bin/pip
+    path: '{{ item.path }}'
+    priority: '{{ item.priority }}'
+  with_items:
+    - { path: '/usr/local/bin/pip2.7', priority: '10' }
+    - { path: '/usr/local/bin/pip{{ python3_version_default | default("3.4") }}', priority: '20' }
+
+- name: Python {{ python3_version_default }} | Update alternatives for pip3
+  alternatives:
+    name: pip3
+    link: /usr/local/bin/pip3
+    path: '{{ item.path }}'
+    priority: '{{ item.priority }}'
+  with_items:
+    - { path: '/usr/local/bin/pip{{ python3_version_default | default("3.4") }}', priority: '10' }
+
+- block:
+  - name: Python 3.6 | Install pip
+    command: "{{ item.python }} /usr/src/get-pip.py"
+    args:
+      creates: '/usr/local/bin/{{ item.pip }}'
+    with_items:
+      - { python: 'python3.6', pip: 'pip3.6' }
+
+  - name: Python 3.6 | Update alternatives for python
+    alternatives:
+      name: python
+      link: /usr/local/bin/python
+      path: '{{ item.path }}'
+      priority: '{{ item.priority }}'
+    with_items:
+      - { path: '/usr/local/bin/python3.6', priority: '30' }
+
+  - name: Python 3.6 | Update alternatives for python3
+    alternatives:
+      name: python3
+      link: /usr/local/bin/python3
+      path: '{{ item.path }}'
+      priority: '{{ item.priority }}'
+    with_items:
+      - { path: '/usr/local/bin/python3.6', priority: '20' }
+
+  - name: Python 3.6 | Update alternatives for pip
+    alternatives:
+      name: pip
+      link: /usr/local/bin/pip
+      path: '{{ item.path }}'
+      priority: '{{ item.priority }}'
+    with_items:
+      - { path: '/usr/local/bin/pip3.6', priority: '30' }
+
+  - name: Python 3.6 | Update alternatives for pip3
+    alternatives:
+      name: pip3
+      link: /usr/local/bin/pip3
+      path: '{{ item.path }}'
+      priority: '{{ item.priority }}'
+    with_items:
+      - { path: '/usr/local/bin/pip3.6', priority: '20' }
+  when: python_version == "3.6"

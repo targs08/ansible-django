@@ -1,0 +1,13 @@
+[options]
+  UseSyslog
+
+{% for item in knockd_rules %}
+[{{ item.name }}]
+  sequence = {{ item.sequence | join(",") }}
+  tcpflags = syn
+  seq_timeout = {{ item.sequence_timeout | default ("15")}}
+  start_command = {{ item.start_command | default('/sbin/iptables -I INPUT 1 -s %IP% -p tcp --dport ' + item.secure_ports | default([]) | join(",") + ' -m comment --comment "Knockd rule ' + item.name + '" -j ACCEPT') }}
+  cmd_timeout = {{ item.cmd_timeout | default("3600")}}
+  stop_command = {{ item.stop_command | default('/sbin/iptables -D INPUT -s %IP% -p tcp --dport ' + item.secure_ports | default([]) | join(",") + ' -m comment --comment "Knockd rule ' + item.name + '" -j ACCEPT') }}
+
+{% endfor %}

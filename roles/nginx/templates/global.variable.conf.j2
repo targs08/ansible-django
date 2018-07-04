@@ -1,0 +1,13 @@
+#
+geo $auth_enabled {
+        default         0;
+
+{%- for key, value in trust_ip_address.iteritems() %}
+
+        # {{ key }}
+{% for item in value %}
+        {{ item }}   1;
+{% endfor %}
+{%- endfor %}
+
+}

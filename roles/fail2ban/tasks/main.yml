@@ -1,0 +1,21 @@
+---
+
+- name: install fail2ban
+  apt: 
+    name: '{{ item }}'
+    update_cache: 'yes'
+    cache_valid_time: 3600
+  with_items:
+    - fail2ban
+  notify: restart fail2ban
+ 
+- name: render jail.local for fail2ban
+  template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+  notify: restart fail2ban
+  
+- name: adds 'fail2ban' to start on boot
+  service:
+    name: fail2ban
+    enabled: yes

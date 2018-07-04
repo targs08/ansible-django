@@ -1,0 +1,8 @@
+---
+
+- name: Nginx | Install package
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+    cache_valid_time: "{{ apt_cache_valid_time }}"

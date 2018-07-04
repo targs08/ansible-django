@@ -1,0 +1,53 @@
+---
+
+- name: ELK Kibana | Install Kibana
+  apt:
+    name: '{{ item }}'
+    state: present
+    update_cache: yes
+  with_items:
+    - 'kibana={{ elasticsearch_version }}'
+  notify:
+    - restart kibana
+
+- name: ELK Kibana |  Install Kibana plugins
+#  kibana_plugin:
+#    name: logtrail
+#    url: 'https://github.com/sivasamyk/logtrail/releases/download/v{{ kibana_logtrail_version[elasticsearch_version] }}/logtrail-{{ elasticsearch_version }}-{{ kibana_logtrail_version[elasticsearch_version] }}.zip'
+#    plugin_bin: /usr/share/kibana/bin/kibana-plugin
+  command: '/usr/share/kibana/bin/kibana-plugin install {{ item }} --timeout 1m'
+  with_items:
+    - 'https://github.com/sivasamyk/logtrail/releases/download/v{{ kibana_logtrail_version[elasticsearch_version] }}/logtrail-{{ elasticsearch_version }}-{{ kibana_logtrail_version[elasticsearch_version] }}.zip'
+  notify:
+    - restart kibana
+  ignore_errors: true
+
+- include_tasks: functions/nginx-site.yml
+  with_items:
+    - { name: 'kibana', template: 'kibana.conf.j2' }
+  notify:
+    - restart kibana
+
+- name: ELK Kibana | Logtrail config Logstash
+  template:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  with_items:
+    - { src: 'logtrail.json.j2', dest: '/usr/share/kibana/plugins/logtrail/logtrail.json' }
+  notify:
+  - restart kibana
+
+- name: ELK Kibana | Kibana disable logging
+  lineinfile:
+    dest: /etc/kibana/kibana.yml
+    state: present
+    regexp: '^.*logging.silent.*$'
+    line: 'logging.silent: true'
+  notify: restart kibana
+
+- name: ELK Kibana | Start the kibana, service
+  service:
+    name: '{{ item }}'
+    enabled: yes
+  with_items:
+    - kibana

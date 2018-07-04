@@ -1,0 +1,61 @@
+---
+# создаем пользователя ssh пользователя(ей) отключаем доступ по root
+
+- name: adds SSH users
+  user: 
+    name: '{{ item.user }}' 
+    shell: '{{ item.shell }}' 
+    password: '{{ item.password }}' 
+    groups: '{{ item.groups }}'
+  with_items:
+    - '{{ ssh_users }}'
+  when: ssh_users is defined
+  notify: 
+    - restart ssh
+  
+- name: configures SSH daemon, disable root access
+  lineinfile: 
+    dest: '/etc/ssh/sshd_config'
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  with_items:
+#    - { regexp: '^PasswordAuthentication', line: 'PasswordAuthentication no' }
+    - { regexp: '^PermitRootLogin', line: 'PermitRootLogin without-password' }
+  when:
+  - ssh_users is defined
+  - root_without_password|default(True) == True
+  notify: 
+    - restart ssh
+
+# Добавляем ssh ключи
+- name: adds SSH authorized keys for root
+  authorized_key:
+    user: root 
+    key:  '{{ item.key }}'
+  with_items:
+    - '{{ ssh_user_root.key_list }}'
+  notify: 
+    - restart ssh
+    
+- name: adds SSH authorized keys for users
+  authorized_key:
+    user: '{{ item.0.user }}' 
+    key:  '{{ item.1.key | default("") }}'
+    key_options: '{{ item.0.command | default() }}' 
+  with_subelements:
+    - '{{ ssh_users }}'
+    - key_list
+    - skip_missing: True
+  notify: 
+    - restart ssh
+
+- name: add sudo rules
+  lineinfile: 
+    dest: /etc/sudoers
+    state: present
+    insertafter: '^# User alias specification'
+    regexp: '^{{ item.user }}.*{{ item.program }}$'
+    line: "{{ item.user }} {{ item.rule }} {{ item.program }}"
+  with_items:
+    - '{{ sudo_rules }}'
+  when: sudo_rules is defined

@@ -1,0 +1,34 @@
+---
+
+- name: systemd-reload
+  command: 'systemctl daemon-reload'
+
+- name: restart docker
+  service:
+    name: docker
+    state: restarted
+
+- name: restart fail2ban
+  service:
+    name: fail2ban
+    state: restarted
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+
+- name: restart elasticsearch
+  service:
+    name: elasticsearch
+    state: restarted
+
+- name: restart kibana
+  service:
+    name: kibana
+    state: restarted
+
+- name: restart gitlab-runner
+  service:
+    name: gitlab-runner
+    state: restarted

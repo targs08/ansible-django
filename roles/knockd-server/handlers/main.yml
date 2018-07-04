@@ -1,0 +1,6 @@
+---
+
+- name: restart knockd-server
+  service:
+    name: knockd
+    state: restarted

@@ -1,0 +1,7 @@
+---
+
+- include_tasks: manual.yml
+  when: gitlab_runner_state == "register"
+
+- include_tasks: unregistration-runner.yml
+  when: gitlab_runner_state == "unregister"

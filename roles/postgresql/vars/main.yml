@@ -1,0 +1,8 @@
+---
+
+postgresql_version: 9.6
+
+postgresql_locale: "en_US.UTF-8"
+
+python_module:
+  - psycopg2

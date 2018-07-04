@@ -1,0 +1,53 @@
+---
+
+- block:
+  - name: Adding APT key newrelic-infra
+    apt_key:
+      url: https://download.newrelic.com/infrastructure_agent/gpg/newrelic-infra.gpg
+  - name: add newrelic repository list and config
+    template:
+      src: '{{ item.src }}'
+      dest: '{{ item.dest }}'
+      owner: root
+      group: root
+    with_items:
+      - { src: 'newrelic-infra.list.j2', dest: '/etc/apt/sources.list.d/newrelic-infra.list' }
+  - name: update cache
+    apt:
+      update_cache: yes
+  - name: install newrelic-infra
+    apt:
+      name: newrelic-infra
+    notify: restart newrelic-infra
+  when: ansible_distribution == "Debian"
+
+- block:
+  - name:
+    get_url:
+      url: https://download.newrelic.com/infrastructure_agent/linux/yum/el/7/x86_64/newrelic-infra.repo
+      dest: /etc/yum.repos.d/newrelic-infra.repo
+      mode: 0444
+  - name: install newrelic infrastructure
+    yum:
+      name: '{{ item }}'
+      state: latest
+      update_cache: yes
+    with_items:
+      - newrelic-infra
+      - newrelic-infra-integrations
+    notify: restart newrelic-infra
+  when: ansible_distribution == "CentOS"
+
+- name: add newrelic repository list and config
+  template:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    owner: root
+    group: root
+  with_items:
+    - { src: 'newrelic-infra.yml.j2', dest: '/etc/newrelic-infra.yml' }
+
+- name: adds newrelic-infra to start on boot
+  service:
+    name: newrelic-infra
+    enabled: yes

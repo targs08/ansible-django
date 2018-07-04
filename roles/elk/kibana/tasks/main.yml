@@ -1,0 +1,8 @@
+---
+
+- include_tasks: '{{ ansible_os_family }}.yml'
+
+#- include_tasks: functions/nginx-site.yml
+#  with_items:
+#    - { name: 'kibana', template: 'rabbitmq.conf.j2' }
+#  when: ansible_os_family == Debian

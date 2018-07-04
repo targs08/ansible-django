@@ -1,0 +1,8 @@
+---
+
+- hosts: all
+  gather_facts: no
+  roles:
+    - { role: 'docker-images', image: ansistrano, tags: ['ansistrano']}
+    - { role: 'docker-images', image: elasticsearch, tags: ['elasticsearch']}
+    - { role: 'docker-images', image: terraform, tags: ['terraform']}

@@ -1,0 +1,19 @@
+---
+
+rabbitmq_users:
+  - user: '{{ lookup(:vault", "secret/rabbitmq/django", "user") }}'
+    password: '{{ lookup(:vault", "secret/rabbitmq/django", "password") }}'
+    tags: django
+    permissions:
+    - vhost: /
+      configure_priv: .*
+      read_priv: .*
+      write_priv: .*
+  - user: '{{ lookup(:vault", "secret/rabbitmq/admin", "user") }}'
+    password: '{{ lookup(:vault", "secret/rabbitmq/admin", "password") }}'
+    tags: administrator
+    permissions:
+    - vhost: /
+      configure_priv: .*
+      read_priv: .*
+      write_priv: .*

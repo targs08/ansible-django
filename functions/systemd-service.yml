@@ -1,0 +1,13 @@
+---
+
+- name: Systemd | [{{ item.name }}] render service config
+  template:
+    src: '{{ item.template }}'
+    dest: '/etc/systemd/system/{{ item.name }}.service'
+  notify: systemd-reload
+
+- name: Systemd | [{{ item.name }}] autorun activate
+  service:
+    name: '{{ item.name }}'
+    enabled: yes
+  when: item.autorun|default(false)|bool == True

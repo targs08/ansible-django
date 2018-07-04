@@ -1,0 +1,112 @@
+---
+
+- hosts: all
+  gather_facts: yes
+  roles:
+    - { role: 'ssh', root_without_password: true, tags: ['ssh'] }
+    - { role: 'iptables-rules', iptables_persistent: true, state: 'present', tags: ['iptables']}
+    - { role: 'python36', tags: ['python'] }
+    - { role: 'memcache', tags: ['memcached'] }
+    - { role: 'postgresql', tags: ['postgresql' ] }
+    - { role: 'nginx',      tags: ['nginx'] }
+    - { role: 'rabbitmq',   tags: ['rabbitmq'] }
+    - { role: 'elk', tags: ['elk', 'elasticsearch', 'kibana', 'logstash'] }
+    - { role: 'inaripro-backend', basic_install: true, tags: ['inaripro-backend', 'backend'] }
+    - { role: 'fail2ban', tags: ['fail2ban'] }
+    - { role: 'certbot', tags: ['certbot'] }
+    - { role: 'knockd-server', tags: ['knockd'] }
+
+
+  vars:
+    stage_name: 'undefined'
+    host_hostname: "{{ stage_name }}"
+
+    server_url_prefix: inari24.ru
+
+    ssh_user_root:
+        key_list: '{{ auth_keys_admin }}'
+
+    frontend_vhosts: '{{ stage_name }}.{{ server_url_prefix }}'
+
+    api_debug: True
+    api_vhosts: 'api.{{ stage_name }}.{{ server_url_prefix }}'
+
+    order_email: 'm5@valoo.ru'
+
+    virtualenv_name: "{{ stage_name }}"
+
+
+    inaripro_backend_scheme: https
+    inaripro_backend_ip_restrictions: true
+
+    celery_count_worker: 1
+
+    postgres_install: true  # Postgres Install
+    postgres_access: true   # Postgres User
+    postgres_restore: true  # Postgres Respore Dump
+
+    rabbitmq_install: true
+    rabbitmq_access: true
+
+    python_version: '3.6'
+    python3_version_default: '3.5'
+    python_source_build: true
+    python_pip_install: true
+
+    elasticsearch_vhost: 'elasticsearch.{{ stage_name }}.{{ server_url_prefix }}'
+    kibana_vhost: 'kibana.{{ stage_name }}.{{ server_url_prefix }}'
+    rabbitmq_menagment_vhost: 'rabbitmq.{{ stage_name }}.{{ server_url_prefix }}'
+
+    certbot_domain:
+      - '{{ api_vhosts }}'
+      - 'www.{{ api_vhosts }}'
+
+    certbot_webroot: /var/www/html
+
+    apt_cache_valid_time: 3600
+    # Для генерации пароля: mkpasswd --method=SHA-512
+    ssh_users:
+      - user: 'ansible'
+        shell: '/bin/bash'
+        groups:
+        password: ''
+        key_list:
+      - user: 'django'
+        shell: '/bin/bash'
+        groups:
+        password: ''
+        key_list:
+
+    sudo_rules:
+      - user: 'ansible'
+        rule: 'ALL=(ALL)'
+        program: 'NOPASSWD:ALL'
+
+    iptables_host_rule:
+      wan_iface: '{{ ansible_default_ipv4.interface }}'
+      icmp_allow: true
+      policy_default:
+        INPUT: DROP
+        FORWARD: DROP
+        OUTPUT: ACCEPT
+      port_access:
+        - { chain: 'INPUT', source: '0.0.0.0/0', protocol: 'tcp', destination_port: '22',    comment: 'SSH Port',   jump: 'ACCEPT' }
+        - { chain: 'INPUT', source: '0.0.0.0/0', protocol: 'tcp', destination_port: '80',    comment: 'HTTP Port',   jump: 'ACCEPT' }
+        - { chain: 'INPUT', source: '0.0.0.0/0', protocol: 'tcp', destination_port: '443',   comment: 'HTTPS Port',   jump: 'ACCEPT' }
+        - { chain: 'INPUT', source: '0.0.0.0/0', protocol: 'tcp', destination_port: '7000', comment: 'Knockd sequence', jump: 'ACCEPT' }
+        - { chain: 'INPUT', source: '0.0.0.0/0', protocol: 'tcp', destination_port: '8000', comment: 'Knockd sequence', jump: 'ACCEPT' }
+        - { chain: 'INPUT', source: '0.0.0.0/0', protocol: 'tcp', destination_port: '9000', comment: 'Knockd sequence', jump: 'ACCEPT' }
+
+    knockd_rules:
+      - name: nginx acl
+        sequence:
+          - 7000:tcp
+          - 8000:tcp
+          - 9000:tcp
+        sequence_timeout: 15
+        start_command: echo 'allow %IP%;' >> /tmp/knockd/nginx.acl && service nginx reload
+        cmd_timeout: 3600
+        stop_command: sed -i '/^allow %IP%;/d' /tmp/knockd/nginx.acl && service nginx reload
+
+  handlers:
+      - import_tasks: handlers/main.yml

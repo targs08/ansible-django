@@ -1,0 +1,17 @@
+---
+
+- name: newrelic-plugins add user for service
+  user:
+    name: newrelic
+    comment: "newrelic plugins user"
+    shell: /usr/sbin/nologin
+    createhome: no
+    system: yes
+
+- include_tasks: meetme.yml
+  when: meetme|default("false")|bool == True
+
+- include_tasks: npi.yml
+  when: npi|default("false")|bool == True
+
+

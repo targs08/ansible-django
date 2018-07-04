@@ -1,0 +1,6 @@
+---
+
+nginx_site:
+  availiable: /etc/nginx/sites-available
+  enable: /etc/nginx/sites-enabled
+

@@ -1,0 +1,12 @@
+[Unit]
+Description=newrelic-plugin-{{ service_name }}
+After=network.target
+
+[Service]
+User=newrelic
+Group=newrelic
+WorkingDirectory=/usr/local/newrelic/
+ExecStart=/usr/local/newrelic/bin/node npi.js start {{ plugin_name }} --foreground
+
+[Install]
+WantedBy=multi-user.target

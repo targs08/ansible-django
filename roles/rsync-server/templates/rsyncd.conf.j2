@@ -1,0 +1,9 @@
+[{{ media_rsync_source }}]
+comment = media
+path = {{ media_rsync_source_path }}
+use chroot = true
+log file = /var/log/rsyncd/media.log
+read only = true
+auth users = {{ media_rsync_user }}
+secrets file = {{ media_rsync_password_file }}
+transfer logging = false

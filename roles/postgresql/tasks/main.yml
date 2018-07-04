@@ -1,0 +1,6 @@
+---
+
+- include_vars: '{{ ansible_os_family }}.yml'
+
+- include_tasks: 'install/main.yml'
+  when: postgres_install|default(false)|bool == True

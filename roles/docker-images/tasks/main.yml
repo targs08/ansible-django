@@ -1,0 +1,30 @@
+---
+
+- block:
+  - name: Login private registry
+    docker_login:
+      api_version: 2
+      registry: '{{ docker_registry_host }}'
+      username: '{{ docker_registry_user }}'
+      password: '{{ docker_registry_pass }}'
+      reauthorize: yes
+  - name: build image(s) [{{ image }}]
+    run_once: true
+    local_action:
+      module: docker_image
+      path: '{{ role_path }}/files/{{ path }}/'
+      name: '{{ docker_registry_host }}/{{ name }}'
+      repository: '{{ docker_registry_host }}/{{ name }}'
+      tag: '{{ tag }}'
+      push: yes
+      force: yes
+    vars:
+      name: '{{ item.value.name | default(item.key) }}'
+      path: '{{ item.value.path | default(item.key) }}'
+      tag: '{{ item.value.tag | default("latest") }}'
+    with_dict: '{{ images_parameters }}'
+    when: item.key == image
+  vars:
+    docker_registry_host:
+    docker_registry_user:
+    docker_registry_pass:

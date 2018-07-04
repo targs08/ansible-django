@@ -1,0 +1,35 @@
+---
+
+- name: PostgreSQL | Install addition dependence
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+    cache_valid_time: "{{ apt_cache_valid_time }}"
+  with_items:
+    - python-setuptools
+
+- name: PostgreSQL | Add PostgreSQL repository apt-key
+  apt_key:
+    id: "{{ postgresql_apt_key_id }}"
+    url: "{{ postgresql_apt_key_url }}"
+    state: present
+
+- name: PostgreSQL | Add PostgreSQL repository
+  apt_repository:
+    repo: "{{ postgresql_apt_repository }}"
+    state: present
+
+- name: PostgreSQL | Install PostgreSQL
+  apt:
+    name: "{{item}}"
+    state: present
+    update_cache: yes
+    cache_valid_time: "{{ apt_cache_valid_time }}"
+  environment:
+    LC_ALL: '{{ postgresql_locale }}'
+    LC_LCTYPE: '{{ postgresql_locale }}'
+  with_items:
+    - "postgresql-{{postgresql_version}}"
+    - "postgresql-client-{{postgresql_version}}"
+    - "postgresql-contrib-{{postgresql_version}}"

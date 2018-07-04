@@ -1,0 +1,23 @@
+---
+
+- name: Certbot | installs python depend
+  pip:
+    name: '{{ item }}'
+  with_items:
+    - 'certbot-nginx'
+
+- name: Certbot | Update nginx config
+  command: 'certbot --authenticator webroot --installer nginx -m {{ certbot_email }} -n --agree-tos -d {{ item }} -w {{ certbot_webroot }}'
+  with_items: '{{ certbot_domain | default([])}}'
+
+- name: Certbox | Get Certificate
+  command: 'certbot certonly --authenticator standalone --pre-hook "nginx -s stop" --post-hook "nginx" -n -d {{ item }}'
+  with_items: '{{ certbot_domain | default([])}}'
+
+- name: Certbot | Cron job for update
+  cron:
+    name: "Certbot update"
+    special_time: monthly
+    job: 'certbot renew'
+  become: true
+  become_user: root

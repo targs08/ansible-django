@@ -1,0 +1,29 @@
+---
+
+- name: Knockd server | install knockd
+  apt:
+    name: '{{ item }}'
+    update_cache: 'yes'
+    cache_valid_time: 3600
+  with_items:
+    - knockd
+
+- name: Knockd server | create temp dir
+  file:
+    path: '/tmp/knockd'
+    mode: 0755
+    state: directory
+
+- name: Knockd server | render knockd config
+  template:
+    src: 'knockd.conf.j2'
+    dest: '/etc/knockd.conf'
+  notify: restart knockd-server
+
+- name: Knockd server | Enabled knockd server
+  lineinfile:
+    dest: /etc/default/knockd
+    state: present
+    regexp: '^START_KNOCKD.*$'
+    line: 'START_KNOCKD=1'
+  notify: restart knockd-server

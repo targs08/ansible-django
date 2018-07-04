@@ -1,0 +1,15 @@
+---
+
+- name: Python 3.6 | Addition package for build
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - 'python3-openssl'
+    - 'dbus'
+    - 'gcc'
+    - 'zlib1g-dev'
+    - 'libssl-dev'
+    - 'libffi-dev'
+    - 'make'
